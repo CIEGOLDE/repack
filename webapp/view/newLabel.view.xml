@@ -1,0 +1,55 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="cie.repack.controller.newLabel"
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<App>
+		<pages>
+			<Page title="{i18n>newlabel}">
+				<Toolbar>
+					<Button press="onBack" text="{i18n>Back}" icon="sap-icon://undo"/>
+				</Toolbar>						
+				<content>
+				    <VBox>
+				    	<HBox>
+						    <VBox width="15%" justifyContent="Center"/>					    		
+					    	<VBox>
+					    		<Text text="{i18n>DestContainerNo}"/>
+					    	</VBox>
+				    	</HBox>
+				    	<HBox>
+					    	<VBox width="15%" justifyContent="Center"/>
+					    	<VBox width="70%" justifyContent="Center">
+					    		<Input id="batchNo" editable="false" 
+					    		       width="100%" value="{/repackSet/Batch}"/>
+					    	</VBox>
+					    	<VBox width="15%" justifyContent="Center"/>
+						</HBox>					    	
+				    </VBox>
+				    <VBox>
+				    	<HBox>
+						    <VBox width="15%" justifyContent="Center"/>					    		
+					    	<VBox>
+					    		<Text text="{i18n>NewDestLocation}"/>
+					    	</VBox>
+				    	</HBox>
+				    	<HBox>
+					    	<VBox width="15%" justifyContent="Center"/>
+					    	<VBox width="70%" justifyContent="Center">
+					    		<Input id="desLocation" textAlign="Left" value="{/repackSet/StorageLocationName}" editable="true" 
+					    		       width="100%" change="onChangeLocation" />
+					    	</VBox>
+					    	<VBox width="15%" justifyContent="Center"/>
+						</HBox>					    	
+				    </VBox>								
+				</content>
+					<footer>
+						<Bar>
+							<contentRight>
+								<Button width="7rem" text="{i18n>Post}" id="butPost" type="Accept"
+								        icon="sap-icon://save"
+								        press="handlePost"/>
+							</contentRight>
+						</Bar>
+					</footer>					
+			</Page>
+		</pages>
+	</App>
+</mvc:View>

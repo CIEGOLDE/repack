@@ -1,0 +1,73 @@
+{
+  "welcomeFile": "/webapp/index.html",
+  "routes": [
+    {
+      "path": "/resources",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "entryPath": "/resources"
+      },
+      "description": "SAPUI5 Resources"
+    },
+    {
+      "path": "/test-resources",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "entryPath": "/test-resources"
+      },
+      "description": "SAPUI5 Resources"
+    },
+    {
+      "path": "/webapp/resources",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "entryPath": "/resources"
+      },
+      "description": "SAPUI5 Resources"
+    },
+    {
+      "path": "/webapp/test-resources",
+      "target": {
+        "type": "service",
+        "name": "sapui5",
+        "entryPath": "/test-resources"
+      },
+      "description": "SAPUI5 Test Resources"
+    },
+    {
+		"path": "/destinations/S4HANACLOUD_BASIC",
+		"target": {
+			"type": "destination",
+			"name": "S4HANACLOUD_BASIC",
+			"entryPath": "/sap/opu/odata/sap"
+		},
+		"description": "CIE Cloud OData Service"
+	},
+    {
+		"path": "/destinations/ZPLPRINTER",
+		"target": {
+			"type": "destination",
+			"name": "ZPLPRINTER"
+		},
+		"description": "CIE Cloud OData Service"
+	},	
+    {
+		"path": "/destinations/CIE_BASIC_SOAP",
+		"target": {
+			"type": "destination",
+			"name": "S4HANACLOUD_BASIC"
+		},
+		"description": "CIE OData Service"
+	},{
+        "path": "/services/userapi",
+        "target": {
+            "type": "service",
+            "name": "userapi"
+        }
+	}	
+  ],
+  "sendWelcomeFileRedirect": true
+}

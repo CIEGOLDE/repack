@@ -1,0 +1,209 @@
+{
+	"_version": "1.12.0",
+	"sap.app": {
+		"id": "cie.repack",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"sourceTemplate": {
+			"id": "ui5template.basicSAPUI5ApplicationProject",
+			"version": "1.40.12"
+		},
+		"dataSources": {
+			"API_MATERIAL_DOCUMENT_SRV": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/API_MATERIAL_DOCUMENT_SRV/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"API_MATERIAL_STOCK_SRV": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/API_MATERIAL_STOCK_SRV/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"API_PRODUCT_SRV": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/API_PRODUCT_SRV/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"API_INBOUND_DELIVERY_SRV": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/API_INBOUND_DELIVERY_SRV;v=0002/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"YY1_RAWMATREIALPUTAWAY_CDS": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/YY1_RAWMATREIALPUTAWAY_CDS/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"YY1_BATCH_AND_SERIAL_CDS": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/YY1_BATCH_AND_SERIAL_CDS/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"YY1_STORAGE_LOCATION_CDS": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/YY1_STORAGE_LOCATION_CDS/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			},
+			"API_BATCH_SRV": {
+				"uri": "/destinations/S4HANACLOUD_BASIC/API_BATCH_SRV/",
+				"type": "OData",
+				"settings": {
+					"annotations": []
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": false,
+		"rootView": {
+			"viewName": "cie.repack.view.App",
+			"type": "XML",
+			"async": true,
+			"id": "appNavContainer"
+		},
+		"dependencies": {
+			"minUI5Version": "1.65.6",
+			"libs": {
+				"sap.ui.layout": {},
+				"sap.ui.core": {},
+				"sap.m": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "cie.repack.i18n.i18n"
+				}
+			},
+			"batchRecord": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Request",
+					"useBatch": true
+				},
+				"dataSource": "API_BATCH_SRV",
+				"preload": true
+			},
+			"batchSerial": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Request",
+					"useBatch": true
+				},
+				"dataSource": "YY1_BATCH_AND_SERIAL_CDS",
+				"preload": true
+			}
+		},
+		"resources": {
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"async": true,
+				"viewPath": "cie.repack.view",
+				"controlAggregation": "pages",
+				"controlId": "appNavContainer",
+				"clearControlAggregation": false,
+				"bypassed": {
+					"target": [
+						"Targetrepack"
+					]
+				}
+			},
+			"routes": [
+				{
+					"name": "Targetrepack",
+					"pattern": "repack",
+					"titleTarget": "",
+					"greedy": false,
+					"target": [
+						"Targetrepack"
+					]
+				},
+				{
+					"name": "newLabel",
+					"pattern": "newLabel",
+					"titleTarget": "",
+					"greedy": false,
+					"target": [
+						"newLabel"
+					]
+				}
+			],
+			"targets": {
+				"Targetrepack": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": true,
+					"viewId": "repack",
+					"viewName": "repack",
+					"viewLevel": 1
+				},
+				"App": {
+					"viewType": "XML",
+					"viewName": "App",
+					"viewLevel": 1
+				},
+				"newLabel": {
+					"viewType": "XML",
+					"viewName": "newLabel",
+					"viewLevel": 2
+				}
+			}
+		}
+	},
+	"sap.platform.hcp": {
+		"uri": "webapp",
+		"_version": "1.1.0"
+	}
+}
