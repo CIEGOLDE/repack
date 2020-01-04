@@ -1,147 +1,53 @@
 <mvc:View controllerName="cie.repack.controller.repack" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m">
 		<App id="repack">
 			<pages>
-				<Page id="page" title="{i18n>Repack}">
+				<Page id="page" title="{i18n>Repack}" showHeader="false">
+				<subHeader>
+					<Toolbar>
+						<HBox width="100%">
+							<VBox width="23%" justifyContent="Center">
+								<Text text="{i18n>SerialNo}" textAlign="End" width="100%"/>
+							</VBox>
+			    			<VBox width="1%" justifyContent="Center"/>								
+							<VBox width="62%">
+								<Input id="serialNo" type="Text" change="onChangeSerial" 
+									   value="{/repackSet/serialNo}">
+								</Input>
+							</VBox>	
+			    			<VBox width="1%" justifyContent="Center"/>									
+			    			<VBox width="10%">
+								<Input id="boxNum" type="Text" editable="false"
+									   value="{/repackSet/boxNum}">
+								</Input>				    				
+			    			</VBox>	
+			    			<VBox width="3%" justifyContent="Center"/>					    			
+						</HBox>							
+					</Toolbar>							
+				</subHeader>
 					<content>
-						<VBox>						
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>SerialNo}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input id="serialNo" type="Text" change="onChangeSerial" 
-										   value="{/repackSet/serialNo}">
-									</Input>
-								</VBox>	
-				    			<VBox width="1%" justifyContent="Center"/>									
-				    			<VBox width="10%">
-									<Input id="boxNum" type="Text" editable="false"
-										   value="{/repackSet/boxNum}">
-									</Input>				    				
-				    			</VBox>	
-				    			<VBox width="3%" justifyContent="Center"/>					    			
-							</HBox>					
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No1}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber0}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No2}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber1}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No3}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber2}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No4}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber3}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No5}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber4}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No6}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber5}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No7}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber6}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No8}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber7}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No9}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber8}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-							<HBox>
-								<VBox width="23%" justifyContent="Center">
-									<Text text="{i18n>No10}" textAlign="End" width="100%"/>
-								</VBox>
-				    			<VBox width="1%" justifyContent="Center"/>								
-								<VBox width="62%">
-									<Input type="Text" value="{/repackSet/serialNumber9}" editable="false">
-									</Input>
-								</VBox>	
-				    			<VBox width="5%" justifyContent="Center"/>									
-							</HBox>		
-						</VBox>		
-					    <VBox height="2%"/>
-					    <VBox>
-					    	<HBox>
-							    <VBox width="23%" justifyContent="Center"/>					    		
-						    	<VBox>
-						    		<Text text="{/repackSet/message}" textAlign="Left"/>
-						    	</VBox>
-					    	</HBox>
-					    </VBox>								
+					<VBox class="tableBox">
+						<Table id="table"
+							inset="false"
+							sticky="ColumnHeaders"
+							growing="true"
+							growingThreshold="10"
+							items="{
+								path: '/serialNumSet'
+							}">
+							<columns>
+								<Column hAlign="Center" width="100%" popinDisplay="Inline">
+									<Text text="{i18n>tableSerialNo}" />
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{SerialNumber}" wrapping="false" tooltip="{SerialNumber}"/>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</VBox>											
 					</content>
 					<footer>
 						<Bar>

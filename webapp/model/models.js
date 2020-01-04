@@ -93,6 +93,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel",
 				itemsSet:[],
 				repackSet:{},
 				batchList:[],
+				stockArry:[],
 				serialNumList:[],//序列号
 				today: new Date()
 			};

@@ -146,12 +146,14 @@ sap.ui.define([
 					if(batchArry.length>0){
 						// Check Material Number same
 						that.checkMaterial(that,batchArry).then(function (result) {
+							that.getView().byId("serialNo").getFocusDomRef().focus();							
 							if(result){
 								that.processSerialBatch(that,serialNo,batchArry);
 							}else{
 								var messagetText = that._ResourceBundle.getText("errorMsg");								
 								that._JSONModel.setProperty("/repackSet/serialNo","");									
-								that._JSONModel.setProperty("/repackSet/message",messagetText);	
+								// that._JSONModel.setProperty("/repackSet/message",messagetText);	
+								messages.showError(messagetText);
 							}
 							that.setBusy(false);								
 						   });
@@ -159,13 +161,14 @@ sap.ui.define([
 						that.setBusy(false);			
 						that._JSONModel.setProperty("/repackSet/serialNo","");							
 						var messagetText = that._ResourceBundle.getText("errMsg1",serialNo);
-						that._JSONModel.setProperty("/repackSet/message",messagetText);							
+						// that._JSONModel.setProperty("/repackSet/message",messagetText);	
+						messages.showError(messagetText);						
 					}
 				}).catch(function (oError) {
 					that.setBusy(false);		
 					that._JSONModel.setProperty("/repackSet/serialNo","");						
-					// messages.showODataErrorText(oError);
-					that._JSONModel.setProperty("/repackSet/message",oError);						
+					messages.showODataErrorText(oError);
+					// that._JSONModel.setProperty("/repackSet/message",oError);
 				});
 			});
 			return promise;			
@@ -204,11 +207,6 @@ sap.ui.define([
 				
 			}
 			serialNumList.push(serialNo);
-			// serialNumList = that.unique(serialNumList);
-			for(var k=0;k<serialNumList.length;k++){
-				var sPath = "/repackSet/serialNumber"+k;
-				that._JSONModel.setProperty(sPath,serialNumList[k]);				
-			}
 			repackSet.boxNum = parseInt(serialNumList.length); 
 			repackSet.serialNo = "";
 			that._JSONModel.setProperty("/serialNumList",serialNumList);
@@ -275,27 +273,22 @@ sap.ui.define([
 			var serialNumList  = that._JSONModel.getProperty("/serialNumList");	
 			var messagetText = "";
 			if(!serialNo){
-				// MessageToast.show("Please input Serial No！");
 				messagetText = that._ResourceBundle.getText("errMsg2");
-				that._JSONModel.setProperty("/repackSet/message",messagetText);					
+				// that._JSONModel.setProperty("/repackSet/message",messagetText);					
+				MessageToast.show(messagetText);				
 				return false;				
 			}			
 			if(serialNo.length<4){
 				that._JSONModel.setProperty("/repackSet/serialNo","");				
 				return false;
 			}
-			if(serialNumList.length===10){
-				that._JSONModel.setProperty("/repackSet/serialNo","");			
-				messagetText = that._ResourceBundle.getText("errMsg3");
-				that._JSONModel.setProperty("/repackSet/message",messagetText);					
-				return false;				
-			}
 			if(serialNumList.length>0){
 				for(var i=0;i<serialNumList.length;i++){
 					if(serialNo===serialNumList[i]){
 						that._JSONModel.setProperty("/repackSet/serialNo","");			
 						messagetText = that._ResourceBundle.getText("errMsg7");
-						that._JSONModel.setProperty("/repackSet/message",messagetText);					
+						// that._JSONModel.setProperty("/repackSet/message",messagetText);	
+						messages.showError(messagetText);
 						return false;							
 					}
 				}
@@ -314,61 +307,69 @@ sap.ui.define([
 			var serialNumSet = that._JSONModel.getProperty("/serialNumSet");	
 			var serialNumList = that._JSONModel.getProperty("/serialNumList");	
 			var aFilters = [];
+			var batchList=[];			
 			if(serialNumSet.length>0){
 				for(var i=0;i<serialNumSet.length;i++){
-					aFilters.push(new Filter('Batch',FilterOperator.EQ, serialNumSet[i].Batch));					
+					aFilters.push(new Filter('Batch',FilterOperator.EQ, serialNumSet[i].Batch));
+					batchList.push(serialNumSet[i].Batch);					
 				}
 			}
 			// Unique
 			aFilters = that.unique(aFilters);
+			batchList = that.unique(batchList);
 			var promise = new Promise(function (resolve, reject) {	
 				// Get Batch Master
 				that.setBusy(true);					
-				that.getBatchMaster(that,aFilters)
-				.then(function (batchRecordArry) {	
+				that.getBatchMaster(that,aFilters).then(function (batchRecordArry) {	
 					if(batchRecordArry.length>0){
 			          // Get Batch StorageLocation
-						that.getBatchStock(that,aFilters)
-						.then(function (stockArry) {  
-							var repackSet = that._JSONModel.getProperty("/repackSet");	
-							if(repackSet.Batch){
-								that.navTo("newLabel");								
+						that.getBatchStock(that,aFilters).then(function (stockArry) {
+							var count=0;
+							for(var k=0;k<batchList.length;k++){
+								for(var m=0;m<stockArry.length;m++){
+									if(batchList[k]===stockArry[m].Batch){
+										count++;
+									}
+								}
+							}			
+							if(count>=stockArry.length){
+								var repackSet = that._JSONModel.getProperty("/repackSet");	
+								that._JSONModel.setProperty("/stockArry",stockArry);
+								if(repackSet.Batch){
+									that.navTo("newLabel");								
+								}else{
+									// Process Batch Information
+									that.processBatchInformation(that,batchRecordArry,stockArry).then(function (averageDay) {
+										// Create Batch
+										var plant = stockArry[0].Plant;
+										that.createBatch(that,batchRecordArry,averageDay,plant).then(function (newBatchNo) {	
+											if(newBatchNo){
+												that._JSONModel.setProperty("/repackSet/Batch",newBatchNo);
+												var	messagetText = that._ResourceBundle.getText("successMsg",newBatchNo);
+												messages.showText(messagetText);						
+												that.navTo("newLabel");
+											}
+										}).catch(function (oError) {
+											that.setBusy(false);		
+											var messageText = $(oError.response.body).find('message').first().text();							
+											messages.showError(messageText);		
+										});								
+									});										
+								}								
 							}else{
-								// Process Batch Information
-								that.processBatchInformation(that,batchRecordArry,stockArry)
-								.then(function (averageDay) {
-									// Create Batch
-									var plant = stockArry[0].Plant;
-									that.createBatch(that,batchRecordArry,averageDay,plant)
-									.then(function (newBatchNo) {	
-										if(newBatchNo){
-											that._JSONModel.setProperty("/repackSet/Batch",newBatchNo);
-											// messages.showText("Batch:"+newBatchNo+"Create successfully");
-											var	messagetText = that._ResourceBundle.getText("successMsg",newBatchNo);
-											that._JSONModel.setProperty("/repackSet/message",messagetText);												
-											
-											that.navTo("newLabel");
-										}
-									}).catch(function (oError) {
-										that.setBusy(false);		
-										var messageText = $(oError.response.body).find('message').first().text();							
-										// messages.showODataErrorText(messageText);		
-										that._JSONModel.setProperty("/repackSet/message",messageText);											
-									});								
-								});										
+								messages.showError(that._ResourceBundle.getText("errMsg34"));												
 							}
 						}).catch(function (oError) {
 							that.setBusy(false);		
 							var messageText = $(oError.response.body).find('message').first().text();							
-							// messages.showODataErrorText(messageText);
-							that._JSONModel.setProperty("/repackSet/message",messageText);								
+							messages.showError(messageText);
 						});								
 					}
 				}).catch(function (oError) {
 					that.setBusy(false);					
 					var messageText = $(oError.response.body).find('message').first().text();							
-					// messages.showODataErrorText(messageText);	
-					that._JSONModel.setProperty("/repackSet/message",messageText);						
+					messages.showError(messageText);	
+					// that._JSONModel.setProperty("/repackSet/message",messageText);						
 					that.clearCache();					
 				});								
 			});
@@ -386,9 +387,15 @@ sap.ui.define([
 					{    
 						that.setBusy( false ); 					
 						var Arry = oData.results;
+						var MaterialStock=[];						
 						if(Arry.length>0){
-							resolve(Arry);
+							for(var i=0;i<Arry.length;i++){
+								if(parseInt(Arry[i].MatlWrhsStkQtyInMatlBaseUnit)>0){
+									MaterialStock.push(Arry[i]);
+								}
+							}							
 						}
+						resolve(MaterialStock);							
 					}.bind( that ),
 					error : function( oError )
 					{

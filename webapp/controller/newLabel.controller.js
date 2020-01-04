@@ -56,7 +56,8 @@ sap.ui.define([
 						that._JSONModel.setProperty("/repackSet/destinationLocation","");	
 						that._JSONModel.setProperty("/repackSet/StorageLocationName","");
 						var messageText = that._ResourceBundle.getText("errMsg4",desLocation);
-						MessageToast.show(messageText);						
+						// MessageToast.show(messageText);	
+						messages.showError(messageText);
 						return;
 					}
 				}.bind( that ),
@@ -72,18 +73,16 @@ sap.ui.define([
 		// Handle Post 
 		handlePost: function(){
 			var that = this;
-			var batchList = that._JSONModel.getProperty("/batchList");	
 			var repackSet = that._JSONModel.getProperty("/repackSet");
-			for(var y=batchList.length-1;y>=0;y--){
+			var stockArry = that._JSONModel.getProperty("/stockArry");
 				var promise = new Promise(function (resolve, reject) {
 					// Call Soap Process Material Document
-					that.mergeBatch(that,batchList[y])
+					that.mergeBatch(that,stockArry)
 					.then(function (results) {
 						if(results){
-							batchList.splice(y,1);							
-						}
-						if(batchList.length===0){
-							that.printSplitBarcode(that,repackSet.Batch);									
+						    var messageText = that._ResourceBundle.getText(("successMsg3"),[repackSet.Batch]);
+							MessageBox.success(messageText);						    
+							that.printSplitBarcode(that,repackSet.Batch);
 						}
 					}).catch(function (oError) {
 						that.setBusy(false);							
@@ -92,7 +91,6 @@ sap.ui.define([
 					});					
 					return promise;							
 				});
-			}
 		},
 		// Clear Cache
 		clearCache: function(){
@@ -104,37 +102,36 @@ sap.ui.define([
 			that.onBack();
 		},
 		// Split Batch Number
-		mergeBatch: function(oController,batch){
+		mergeBatch: function(oController,stockArry){
 			var that = this;
 			var messagetText = "";
 			that.setBusy(true);		
 			var promise = new Promise(function (resolve, reject) {
-				that.getSerialNumber(that,batch)
-				.then(function (SNumberList) {
 				// Call Soap Process Material Document
 				var NewBatchNo = that._JSONModel.getProperty("/repackSet/Batch");
-				that.callSoapProcessMatDocument(that,SNumberList,batch,NewBatchNo)
+				var desLocation = that.byId("desLocation").getValue();
+				if(!desLocation){
+				var StorageLocation="";
+					for(var i=0;i<stockArry.length;i++){
+						if(!StorageLocation){
+							StorageLocation = stockArry[i].StorageLocation;
+						}else if(StorageLocation&&StorageLocation!==stockArry[i].StorageLocation){
+				    		messages.showError(that._ResourceBundle.getText("errMsg35"));								
+							return;
+						}
+					}							
+				}
+				that.callSoapProcessMatDocument(that,NewBatchNo,stockArry)
 				.then(function (status) {
 					that.setBusy(false);		
 					if(status==="success"){
-						// MessageToast.show("Created successfully");
-						messagetText = that._ResourceBundle.getText("successMsg1");
-						that._JSONModel.setProperty("/repackSet/message",messagetText);							
 						resolve(true);
 					}else{
-						// MessageToast.show("Created failure,Please Check data");	
 						messagetText = that._ResourceBundle.getText("errMsg5");
-						that._JSONModel.setProperty("/repackSet/message",messagetText);							
+						messages.showError(messagetText);                         
 						resolve(false);						
 					}
 				});	
-				})
-				// Catch Error
-				.catch(function (oError) {
-					that.setBusy(false);							
-					messages.showODataErrorText(oError);
-					reject(oError);
-				});					
 			});
 			return promise;					
 		},
@@ -188,8 +185,8 @@ sap.ui.define([
 		},
 		printBoxLabel: function(oController,Quantity,Batch,Material,description){
 			var that = this;
-			var ServiceName = that._JSONMoel.getProperty("/ServiceName");
-				ServiceName = ServiceName?ServiceName:"78440BDE715FB0DC";//获取配置打印机信息，如无取默认值
+			var ServiceName = that._JSONModel.getProperty("/ServiceName");
+				// ServiceName = ServiceName?ServiceName:"78440BDE715FB0DC";//获取配置打印机信息，如无取默认值
 			var url = "https://ciedev.erik.top:8443/api/Service/"+ServiceName+"/Print";			
 			var printArr = [],printBox = [];
 			var currentDate = that.printBoxDate(" ");       
@@ -269,31 +266,26 @@ sap.ui.define([
 				},
 				error: function (xhr, status) {
 					messagetText = that._ResourceBundle.getText("errMsg6");						
-					// messages.showText(messagetText);
-					that._JSONModel.setProperty("/repackSet/message",messagetText);						
+					messages.showError(messagetText);
 				},
 				complete: function (xhr, status) {
 					that.clearCache();
 					if(status==="success"){
 						messagetText = that._ResourceBundle.getText("successMsg2");
-						// messages.showText(messagetText);		
-						that._JSONModel.setProperty("/repackSet/message",messagetText);							
+						messages.showText(messagetText);		
 					}else{
 						messagetText = that._ResourceBundle.getText("errMsg6");						
-						// messages.showText(messagetText);				
-						that._JSONModel.setProperty("/repackSet/message",messagetText);							
+						messages.showError(messagetText);				
 					}
-					// that.onBack();							
 				}
 	
 			});						
 		},			
 		// Call Soap API
-		callSoapProcessMatDocument: function(oController,SNumberList,batch,newBatchNo){
+		callSoapProcessMatDocument: function(oController,newBatchNo,stockArry){
 			var that = this;			
 			var repackSet = that._JSONModel.getProperty("/repackSet");
-			var Quantity = 	SNumberList.length;
-			var destinationLocation = repackSet.destinationLocation?repackSet.destinationLocation:SNumberList[0].StorageLocation;
+			var serialNumSet  = that._JSONModel.getProperty("/serialNumSet");			
 			// Posting Data Logic And User Name
 			var postingDate = oController._JSONModel.getProperty("/postingDate");
 		    var today = postingDate?postingDate:oController.formatter.date(new Date());
@@ -303,10 +295,37 @@ sap.ui.define([
 				var userName = userInfoSet[0].PersonFullName?userInfoSet[0].PersonFullName:"";
 			}					
 			var creationDate = that.getNowFormatDate("T")+"Z" ;                        
-			var SNdata = "";
-			for (var i = 0; i < SNumberList.length; i++) {
-				SNdata = SNdata + '<SerialNumbers>' + SNumberList[i].SerialNumber+ '</SerialNumbers>';
-			}
+			var MaterialDocumentItem = "";
+			var itemNo = 0;			
+			for(var k=0;k<stockArry.length;k++){
+				itemNo++;				
+				var Material="";
+				var SNdata = "";		
+				var Quantity=0;		
+				var destinationLocation = repackSet.destinationLocation?repackSet.destinationLocation:stockArry[k].StorageLocation;				
+				// 获取序列号数据与数量
+				for(var i=0;i<serialNumSet.length;i++){
+					if(stockArry[k].Batch===serialNumSet[i].Batch){
+						Quantity++;
+						Material = serialNumSet[i].Material;
+						SNdata = SNdata + '<SerialNumbers>' + serialNumSet[i].SerialNumber+ '</SerialNumbers>';						
+					}
+				}
+				MaterialDocumentItem = MaterialDocumentItem +
+				'<MaterialDocumentItem>' +
+				'<GoodsMovementType>311</GoodsMovementType>' +
+				'<MaterialDocumentLine>'+itemNo+'</MaterialDocumentLine>' +
+				'<ParentMaterialDocumentLine>0</ParentMaterialDocumentLine>' +
+				'<Material>' + Material + '</Material>' +
+				'<Batch>' + stockArry[k].Batch + '</Batch>' +			
+				'<IssgOrRcvgBatch>' + newBatchNo + '</IssgOrRcvgBatch>' +						
+				'<Plant>' + stockArry[k].Plant + '</Plant>' +
+				'<StorageLocation>' + stockArry[k].StorageLocation + '</StorageLocation>' +					
+				'<QuantityInEntryUnit unitCode="PCE">' + Quantity + '</QuantityInEntryUnit>' +
+				'<IssuingOrReceivingStorageLoc>'+destinationLocation+'</IssuingOrReceivingStorageLoc>' +                        
+				SNdata +
+				'</MaterialDocumentItem>' ;	
+			}				
 			var promise = new Promise(function (resolve, reject) {				
 			var request =
 				'<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:glob="http://sap.com/xi/APPL/Global2">' +
@@ -324,19 +343,7 @@ sap.ui.define([
 				'<PostingDate>' + today + '</PostingDate>' +
 				'<DocumentDate>' + today + '</DocumentDate>' +
 	    		'<Description>'+userName+'</Description>' +					
-				'<MaterialDocumentItem>' +
-				'<GoodsMovementType>311</GoodsMovementType>' +
-				'<MaterialDocumentLine>1</MaterialDocumentLine>' +
-				'<ParentMaterialDocumentLine>0</ParentMaterialDocumentLine>' +
-				'<Material>' + SNumberList[0].Material + '</Material>' +
-				'<Batch>' + batch + '</Batch>' +			
-				'<IssgOrRcvgBatch>' + newBatchNo + '</IssgOrRcvgBatch>' +						
-				'<Plant>' + SNumberList[0].Plant + '</Plant>' +
-				'<StorageLocation>' + SNumberList[0].StorageLocation + '</StorageLocation>' +					
-				'<QuantityInEntryUnit unitCode="PCE">' + Quantity + '</QuantityInEntryUnit>' +
-				'<IssuingOrReceivingStorageLoc>'+destinationLocation+'</IssuingOrReceivingStorageLoc>' +                        
-				SNdata +
-				'</MaterialDocumentItem>' +
+				MaterialDocumentItem+				
 				'</MaterialDocument>' +
 				'</glob:MaterialDocumentCreateRequest_Async>' +
 				'</soap:Body>' +
